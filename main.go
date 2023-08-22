@@ -49,7 +49,7 @@ func index(w http.ResponseWriter, r *http.Request){
 }
 
 func about_page(w http.ResponseWriter, r *http.Request){
-	if r.URL.Path != "/" {
+	if r.URL.Path != "/about/" {
 		http.NotFound(w, r)
 		return
 	}
