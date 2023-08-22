@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -27,38 +26,52 @@ func loadPage (title string) (*Page, error) {
 	return &Page{Title: title, Body: body}, nil
 }
 
-func home_page(w http.ResponseWriter, r *http.Request){
+func index(w http.ResponseWriter, r *http.Request){
 	//fmt.Fprintf(w, "My website works! The name of this page is: %s", r.URL.Path[1:])
-	title := r.URL.Path
-	p, err := loadPage(title)
-	if err != nil {
-		p = &Page{ Title: title}
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
 	}
-	t,err := template.ParseFiles("templates/index.html")
+
+	t,err := template.ParseFiles("templates/index.html", "templates/header.html", "templates/footer.html")
 	if err != nil {
-		p = &Page{ Title: title}
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
 	}
-	t.Execute(w, p)
+	err = t.ExecuteTemplate(w , "index", nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
 
 }
 
 func about_page(w http.ResponseWriter, r *http.Request){
-	title := r.URL.Path[1:len(r.URL.Path)-1]
-	p, err := loadPage(title)
-	if err != nil {
-		p = &Page{ Title: title}
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
 	}
-	t,err := template.ParseFiles("templates/about.html")
+	t,err := template.ParseFiles("templates/about.html", "templates/header.html", "templates/footer.html")
 	if err != nil {
-		p = &Page{ Title: title}
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
 	}
-	t.Execute(w, p)
+	err = t.ExecuteTemplate(w , "about", nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal Server Error", 500)
+		return
+	}
 
 }
 
 func main() {
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	http.HandleFunc("/",index)
 	http.HandleFunc("/about/",about_page)
-	http.HandleFunc("/",home_page)
 
 	log.Fatal(http.ListenAndServe(":8080",nil))
 

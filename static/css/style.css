@@ -7,7 +7,7 @@
 .btn-light,
 .btn-light:hover,
 .btn-light:focus {
-  color: #ff0000;
+  color: #ccbbbb;
   text-shadow: none; /* Prevent inheritance from `body` */
 }
 
@@ -31,13 +31,14 @@ body {
  */
 
 .nav-masthead .nav-link {
-  color: rgba(255, 255, 255, .5);
+  color: rgba(161, 161, 161, 0.8);
   border-bottom: .25rem solid transparent;
 }
 
 .nav-masthead .nav-link:hover,
 .nav-masthead .nav-link:focus {
-  border-bottom-color: rgba(255, 255, 255, .25);
+  color: rgb(255, 255, 255);
+  border-bottom-color: rgb(255, 255, 255);
 }
 
 .nav-masthead .nav-link + .nav-link {
@@ -45,6 +46,6 @@ body {
 }
 
 .nav-masthead .active {
-  color: #fff;
+  color: #ffffff;
   border-bottom-color: #fff;
 }
