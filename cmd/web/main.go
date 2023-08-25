@@ -3,19 +3,42 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 )
+
+type application struct {
+	infoLog *log.Logger
+	errorLog *log.Logger
+}
 
 func main() {
 	// создаю свой маршрутизатор с ограниченной областью видимости в целях безопасности
 	mux := http.NewServeMux()
-	fileServer := http.FileServer(restrictedFileSystem{http.Dir("./static/")})
+	port := ":8080"
+	fileServer := http.FileServer(restrictedFileSystem{http.Dir("./ui/static/")})
+
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	app := application{
+		infoLog: infoLog,
+		errorLog: errorLog,
+	}
+
 	mux.Handle("/static", http.NotFoundHandler())
 	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
-	mux.HandleFunc("/", index)
-	mux.HandleFunc("/about/", about_page)
+	mux.HandleFunc("/", app.index)
+	mux.HandleFunc("/about/", app.about_page)
 
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	server := &http.Server{
+		Addr: port,
+		Handler: mux,
+		ErrorLog: errorLog,
+	}
+
+	infoLog.Printf("Запуск сервера на порте: %s", port)
+	errorLog.Fatal(server.ListenAndServe())
 
 }
 
