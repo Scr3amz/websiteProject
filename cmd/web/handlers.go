@@ -5,9 +5,10 @@ import (
 	"net/http"
 )
 
+// Обработчик главной страницы
 func (app *application) index(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 	files := []string{
@@ -17,21 +18,20 @@ func (app *application) index(w http.ResponseWriter, r *http.Request) {
 	}
 	t, err := template.ParseFiles(files...)
 	if err != nil {
-		app.errorLog.Println(err.Error())
-		http.Error(w, "Internal Server Error", 500)
+		app.serverError(w, err)
 		return
 	}
 	err = t.ExecuteTemplate(w, "index", nil)
 	if err != nil {
-		app.errorLog.Println(err.Error())
-		http.Error(w, "Internal Server Error", 500)
+		app.serverError(w, err)
 		return
 	}
 }
 
+// Обработчик страницы "обо мне"
 func (app *application)about_page(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/about/" {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 	files := []string{
@@ -41,14 +41,12 @@ func (app *application)about_page(w http.ResponseWriter, r *http.Request) {
 	}
 	t, err := template.ParseFiles(files...)
 	if err != nil {
-		app.errorLog.Println(err.Error())
-		http.Error(w, "Internal Server Error", 500)
+		app.serverError(w, err)
 		return
 	}
 	err = t.ExecuteTemplate(w, "about", nil)
 	if err != nil {
-		app.errorLog.Println(err.Error())
-		http.Error(w, "Internal Server Error", 500)
+		app.serverError(w, err)
 		return
 	}
 

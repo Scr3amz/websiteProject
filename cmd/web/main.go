@@ -7,17 +7,18 @@ import (
 	"path/filepath"
 )
 
+/*  Структура для передачи логгеров в соседние файлы, и 
+для общей инкапсуляции приложения */ 
 type application struct {
 	infoLog *log.Logger
 	errorLog *log.Logger
 }
 
 func main() {
-	// создаю свой маршрутизатор с ограниченной областью видимости в целях безопасности
-	mux := http.NewServeMux()
 	port := ":8080"
-	fileServer := http.FileServer(restrictedFileSystem{http.Dir("./ui/static/")})
-
+	
+	/* Логгеры для более удобной и настраевоемой обработки ошибок и
+	выводе информации в терминал */ 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
@@ -26,14 +27,11 @@ func main() {
 		errorLog: errorLog,
 	}
 
-	mux.Handle("/static", http.NotFoundHandler())
-	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
-	mux.HandleFunc("/", app.index)
-	mux.HandleFunc("/about/", app.about_page)
-
+	/* Отдельный объект для сервера чтобы указать в качестве поля ErrorLog свой логгер, а 
+	в качестве обработчика функцию, создающую маршрутизатор*/ 
 	server := &http.Server{
 		Addr: port,
-		Handler: mux,
+		Handler: app.router(),
 		ErrorLog: errorLog,
 	}
 
@@ -41,6 +39,8 @@ func main() {
 	errorLog.Fatal(server.ListenAndServe())
 
 }
+
+// Ограничиваю доступ к просмотру файлов, если в директории нет index-файла
 
 type restrictedFileSystem struct {
 	fs http.FileSystem
