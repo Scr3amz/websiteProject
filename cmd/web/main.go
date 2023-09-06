@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Scr3amz/websiteProject/pkg/models/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -18,6 +19,7 @@ import (
 type application struct {
 	infoLog  *log.Logger
 	errorLog *log.Logger
+	notes    *mysql.NoteModel
 }
 
 func main() {
@@ -28,7 +30,7 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	/* Подключение к базе данных */
+	/* Подключение к пулу соединений с базой данных */
 	db, err := openDB("web:8803@/mvol_website?parseTime=true")
 	if err != nil {
 		errorLog.Fatal(err)
@@ -39,6 +41,7 @@ func main() {
 	app := application{
 		infoLog:  infoLog,
 		errorLog: errorLog,
+		notes:    &mysql.NoteModel{DB: db},
 	}
 
 	/* Отдельный объект для сервера чтобы указать в качестве поля ErrorLog свой логгер, а
