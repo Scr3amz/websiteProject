@@ -59,23 +59,20 @@ func (app *application) about_page(w http.ResponseWriter, r *http.Request) {
 
 /*Обработчик страницы с заметками*/
 func (app *application) notes_page(w http.ResponseWriter, r *http.Request) {
-	// Получение параметра id из ссылки
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
-	if err != nil || id < 1 {
-		http.NotFound(w, r)
+	if r.URL.Path != "/notes/" {
+		app.notFound(w)
 		return
 	}
 
-	note, err := app.notes.Get(id)
+	notes, err := app.notes.Latest()
 	if err != nil {
-		if errors.Is(err, models.ErrNoRecord) {
-			app.notFound(w)
-			return
-		} else {
-			app.serverError(w, err)
-		}
+		app.serverError(w, err)
+		return		
 	}
-	fmt.Fprintf(w, "%v", note)
+	for _,note := range notes {
+		fmt.Fprintf(w, "%v", note)
+	}
+	
 	/*
 		files := []string{
 			"./ui/html/notes.html",
@@ -93,6 +90,27 @@ func (app *application) notes_page(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	*/
+}
+
+/**/
+func (app *application) show_note(w http.ResponseWriter, r *http.Request) {
+	// Получение параметра id из ссылки
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
+	note, err := app.notes.Get(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecord) {
+			app.notFound(w)
+			return
+		} else {
+			app.serverError(w, err)
+		}
+	}
+	fmt.Fprintf(w, "%v", note)
 }
 
 /* Обработчик для создания заметки*/

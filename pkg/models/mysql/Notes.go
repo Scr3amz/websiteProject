@@ -20,7 +20,7 @@ type NoteModel struct {
 func (m *NoteModel) Insert(title, content, expires string) (int, error) {
 	/*SQL-запрос с использованием плейсхолдеров*/
 	sqlCommand := `INSERT INTO notes (title,content,created,expires)
-					VALUES (?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY))`
+	VALUES (?, ?, LOCALTIMESTAMP(), DATE_ADD(LOCALTIMESTAMP(), INTERVAL ? DAY))`
 	resault, err := m.DB.Exec(sqlCommand, title, content, expires)
 	if err != nil {
 		return -1, err
@@ -39,7 +39,7 @@ func (m *NoteModel) Insert(title, content, expires string) (int, error) {
 на структуру Note, которая заполняется из БД
 */
 func (m *NoteModel) Get(id int) (*models.Note, error) {
-	sqlCommand := "SELECT * FROM notes WHERE id = ? AND expires > UTC_TIMESTAMP()"
+	sqlCommand := "SELECT * FROM notes WHERE id = ? AND expires > LOCALTIMESTAMP()"
 	row := m.DB.QueryRow(sqlCommand, id)
 	note := &models.Note{}
 	err := row.Scan(&note.ID, &note.Title, &note.Content, &note.Created, &note.Expires)
@@ -55,5 +55,28 @@ func (m *NoteModel) Get(id int) (*models.Note, error) {
 }
 
 func (m *NoteModel) Latest() ([]*models.Note, error) {
-	return nil, nil
+	sqlCommand := "SELECT * FROM notes WHERE expires > LOCALTIMESTAMP() ORDER BY created DESC LIMIT 10"
+
+	rows, err := m.DB.Query(sqlCommand)
+	if err!=nil {
+		return nil, err
+	}
+	defer rows.Close()
+	notes := []*models.Note{}
+
+	for rows.Next() {
+		note := &models.Note{}
+		err = rows.Scan(&note.ID, &note.Title, &note.Content, &note.Created, &note.Expires )
+		if err!=nil {
+			return nil, err
+		}
+		notes = append(notes, note)
+	}
+
+	err = rows.Err() 
+	if err!=nil {
+		return nil, err
+	}
+	
+	return notes, nil
 }
