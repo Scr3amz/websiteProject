@@ -1,0 +1,34 @@
+{{ define "show"}}
+<head>
+
+  <title>Заметка №{{.ID}}</title>
+</head>
+
+<body class="d-flex h-100 text-center text-bg-dark">
+
+
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+  {{ template "header"}}
+
+
+  <main >
+    <div class="note">
+      <h1> Заметка №{{.ID}}</h1>
+      <p class="lead"> {{.Title}}</p>
+      <pre><p class="content"> {{.Content}}</p></pre>
+      <br>
+      <br>
+      <p class="lead">
+        Создан: {{.Created}}
+        Исчезнет: {{.Expires}}
+      </p>
+    </div>
+  </main>
+
+
+  {{ template "footer"}}
+</div>
+
+</body>
+
+{{ end }}

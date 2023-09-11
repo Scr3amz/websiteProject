@@ -110,7 +110,21 @@ func (app *application) show_note(w http.ResponseWriter, r *http.Request) {
 			app.serverError(w, err)
 		}
 	}
-	fmt.Fprintf(w, "%v", note)
+	files := []string{
+		"./ui/html/show.html",
+		"./ui/html/header.html",
+		"./ui/html/footer.html",
+	}
+	t, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	err = t.ExecuteTemplate(w, "show", note)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 }
 
 /* Обработчик для создания заметки*/
