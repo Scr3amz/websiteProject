@@ -69,30 +69,30 @@ func (app *application) notes_page(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return		
 	}
-	for _,note := range notes {
-		fmt.Fprintf(w, "%v", note)
+	// for _,note := range notes {
+	// 	fmt.Fprintf(w, "%v", note)
+	// }
+	
+	data:= &templateData{Notes: notes}
+	files := []string{
+		"./ui/html/notes.html",
+		"./ui/html/header.html",
+		"./ui/html/footer.html",
+	}
+	t, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	err = t.ExecuteTemplate(w, "notes", data)
+	if err != nil {
+		app.serverError(w, err)
+		return
 	}
 	
-	/*
-		files := []string{
-			"./ui/html/notes.html",
-			"./ui/html/header.html",
-			"./ui/html/footer.html",
-		}
-		t, err := template.ParseFiles(files...)
-		if err != nil {
-			app.serverError(w, err)
-			return
-		}
-		err = t.ExecuteTemplate(w, "notes", note)
-		if err != nil {
-			app.serverError(w, err)
-			return
-		}
-	*/
 }
 
-/**/
+/* Метод, показывающий заметку по её id из БД*/
 func (app *application) show_note(w http.ResponseWriter, r *http.Request) {
 	// Получение параметра id из ссылки
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
@@ -115,12 +115,13 @@ func (app *application) show_note(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/header.html",
 		"./ui/html/footer.html",
 	}
+	data := &templateData{Note: note}
 	t, err := template.ParseFiles(files...)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	err = t.ExecuteTemplate(w, "show", note)
+	err = t.ExecuteTemplate(w, "show", data)
 	if err != nil {
 		app.serverError(w, err)
 		return
