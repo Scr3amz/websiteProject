@@ -7,11 +7,8 @@
   {{ template "header"}}
 
   {{with .Note}}
-  <head>
-
-    <title>Заметка №{{.ID}}</title>
-  </head>
   <main >
+    <title>Заметка №{{.ID}}</title>
     <div class="note">
       <!-- <h1> Заметка №{{.ID}}</h1> -->
       <h1 > {{.Title}}</h1>
@@ -19,10 +16,8 @@
       <pre><p class="content"> {{.Content}}</p></pre>
       <br>
       <br>
-      <p class="lead">
-        Создан: {{.Created}}
-        Исчезнет: {{.Expires}}
-      </p>
+      <p align="left" class="time"  >Создан: {{.Created.Local}}</p> 
+      <p align="right" class="lead">Исчезнет: {{.Expires.Local}}</p>
     </div>
   </main>
   {{end}}

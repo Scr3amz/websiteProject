@@ -7,53 +7,43 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Scr3amz/websiteProject/internal/web/handlers"
 	"github.com/Scr3amz/websiteProject/pkg/models/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-/*
-	Структура для передачи логгеров в соседние файлы, и
-
-для общей инкапсуляции приложения
-*/
-type application struct {
-	infoLog  *log.Logger
-	errorLog *log.Logger
-	notes    *mysql.NoteModel
-}
-
 func main() {
-	port := ":8080"
+	port := ":3000"
 
 	/* Логгеры для более удобной и настраевоемой обработки ошибок и
 	выводе информации в терминал */
-	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
-	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	InfoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	ErrorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	/* Подключение к пулу соединений с базой данных */
 	db, err := openDB("web:8803@/mvol_website?parseTime=true")
 	if err != nil {
-		errorLog.Fatal(err)
+		ErrorLog.Fatal(err)
 	}
 
 	defer db.Close()
 
-	app := application{
-		infoLog:  infoLog,
-		errorLog: errorLog,
-		notes:    &mysql.NoteModel{DB: db},
+	app := handlers.Application{
+		InfoLog:  InfoLog,
+		ErrorLog: ErrorLog,
+		Notes:    &mysql.NoteModel{DB: db},
 	}
 
 	/* Отдельный объект для сервера чтобы указать в качестве поля ErrorLog свой логгер, а
 	в качестве обработчика функцию, создающую маршрутизатор*/
 	server := &http.Server{
 		Addr:     port,
-		Handler:  app.router(),
-		ErrorLog: errorLog,
+		Handler:  app.Router(),
+		ErrorLog: ErrorLog,
 	}
 
-	infoLog.Printf("Запуск сервера на порте: %s", port)
-	errorLog.Fatal(server.ListenAndServe())
+	InfoLog.Printf("Запуск сервера на порте: %s", port)
+	ErrorLog.Fatal(server.ListenAndServe())
 
 }
 

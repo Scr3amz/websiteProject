@@ -1,21 +1,17 @@
 {{ define "about"}}
-<head>
-    <title>O6o мне</title>
-  </head>
-
 <body class="d-flex h-100 text-center text-bg-dark">
 
-<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
-  {{ template "header"}}
+  <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
 
-  <main class="px-3">
-    <h1>O6o мне</h1>
-    <p class="lead">Привет! Меня зовут Волчанин Михаил, и это мой сайт-визитка, написанный c помощью языка программирования GO.</p>
-  </main>
+    {{ template "header"}}
+    <title>O6o мне</title> 
+    <main class="px-3">
+      <h1>O6o мне</h1>
+      <p class="lead">Привет! Меня зовут Волчанин Михаил, и это мой сайт-визитка, написанный c помощью языка программирования GO.</p>
+    </main>
+    {{ template "footer"}}
 
-  {{ template "footer"}}
-</div>
-<script src="/docs/5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+  </div>
 
 </body>
 

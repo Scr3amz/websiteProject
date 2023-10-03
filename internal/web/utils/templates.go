@@ -1,4 +1,4 @@
-package main
+package utils
 
 import "github.com/Scr3amz/websiteProject/pkg/models"
 
@@ -6,4 +6,8 @@ import "github.com/Scr3amz/websiteProject/pkg/models"
 type templateData struct {
 	Note *models.Note
 	Notes []*models.Note
+}
+
+func CreateData() *templateData {
+	 return &templateData{}
 }

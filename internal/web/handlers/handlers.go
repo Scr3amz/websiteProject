@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"errors"
@@ -7,11 +7,14 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Scr3amz/websiteProject/internal/web/utils"
 	"github.com/Scr3amz/websiteProject/pkg/models"
 )
 
+
+
 // Обработчик главной страницы
-func (app *application) index(w http.ResponseWriter, r *http.Request) {
+func (app *Application) index(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		app.notFound(w)
 		return
@@ -34,7 +37,7 @@ func (app *application) index(w http.ResponseWriter, r *http.Request) {
 }
 
 // Обработчик страницы "обо мне"
-func (app *application) about_page(w http.ResponseWriter, r *http.Request) {
+func (app *Application) about_page(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/about/" {
 		app.notFound(w)
 		return
@@ -58,22 +61,23 @@ func (app *application) about_page(w http.ResponseWriter, r *http.Request) {
 }
 
 /*Обработчик страницы с заметками*/
-func (app *application) notes_page(w http.ResponseWriter, r *http.Request) {
+func (app *Application) notes_page(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/notes/" {
 		app.notFound(w)
 		return
 	}
 
-	notes, err := app.notes.Latest()
+	notes, err := app.Notes.Latest()
 	if err != nil {
 		app.serverError(w, err)
-		return		
+		return
 	}
 	// for _,note := range notes {
 	// 	fmt.Fprintf(w, "%v", note)
 	// }
-	
-	data:= &templateData{Notes: notes}
+
+	data := utils.CreateData()
+	data.Notes = notes
 	files := []string{
 		"./ui/html/notes.html",
 		"./ui/html/header.html",
@@ -89,11 +93,11 @@ func (app *application) notes_page(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	
+
 }
 
 /* Метод, показывающий заметку по её id из БД*/
-func (app *application) show_note(w http.ResponseWriter, r *http.Request) {
+func (app *Application) show_note(w http.ResponseWriter, r *http.Request) {
 	// Получение параметра id из ссылки
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil || id < 1 {
@@ -101,7 +105,7 @@ func (app *application) show_note(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	note, err := app.notes.Get(id)
+	note, err := app.Notes.Get(id)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
 			app.notFound(w)
@@ -115,7 +119,8 @@ func (app *application) show_note(w http.ResponseWriter, r *http.Request) {
 		"./ui/html/header.html",
 		"./ui/html/footer.html",
 	}
-	data := &templateData{Note: note}
+	data := utils.CreateData()
+	data.Note = note
 	t, err := template.ParseFiles(files...)
 	if err != nil {
 		app.serverError(w, err)
@@ -129,7 +134,7 @@ func (app *application) show_note(w http.ResponseWriter, r *http.Request) {
 }
 
 /* Обработчик для создания заметки*/
-func (app *application) create_note(w http.ResponseWriter, r *http.Request) {
+func (app *Application) create_note(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
@@ -139,7 +144,7 @@ func (app *application) create_note(w http.ResponseWriter, r *http.Request) {
 	content := "test content"
 	expires := "2"
 
-	id, err := app.notes.Insert(title, content, expires)
+	id, err := app.Notes.Insert(title, content, expires)
 	if err != nil {
 		app.serverError(w, err)
 		return

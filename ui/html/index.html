@@ -1,21 +1,17 @@
 {{ define "index"}}
 
-<head>
-    <title>Главная</title>
-  </head>
-
 <body class="d-flex h-100 text-center text-bg-dark">
 
-<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
-  {{ template "header"}}
+  <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    {{ template "header"}}
+    <title>Главная</title>
+    <main class="px-3">
+      <h1>Главная </h1>
+      <p class="lead">Здесь я буду рассказывать o всём том, чему уже успел научится</p>
+    </main>
 
-  <main class="px-3">
-    <h1>Главная </h1>
-    <p class="lead">Здесь я буду рассказывать o всём том, чему уже успел научится</p>
-  </main>
-
-  {{ template "footer"}}
-</div>
+    {{ template "footer"}}
+  </div>
 
 </body>
 

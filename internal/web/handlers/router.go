@@ -1,15 +1,14 @@
-package main
+package handlers
 
 import "net/http"
 
 // Маршрутизатор с ограниченной областью видимости в целях безопасности
-func (app *application) router() *http.ServeMux {
+func (app *Application) Router() *http.ServeMux {
 	mux := http.NewServeMux()
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 
 	// Обработчики статических и html- файлов
-	
-	
+
 	mux.HandleFunc("/", app.index)
 	mux.HandleFunc("/about/", app.about_page)
 	mux.HandleFunc("/notes/", app.notes_page)
