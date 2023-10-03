@@ -7,11 +7,12 @@ type Config struct {
 	DBName string `mapstructure:"MYSQL_DB_NAME"`
 	DBUser string `mapstructure:"MYSQL_USERNAME"`
 	DBPass string `mapstructure:"MYSQL_PASSWORD"`
+	DriverParams string `mapstructure:"MYSQL_DRIVER_PARAMS"`
 }
 
 func LoadConfig() (Config, error){
-	viper.AddConfigPath("./intrnal/web/config")
-	viper.SetConfigName("config")
+	viper.AddConfigPath("./internal/web/config")
+	viper.SetConfigName("app")
 	viper.SetConfigType("env")
 	err := viper.ReadInConfig()
 	if err!= nil {

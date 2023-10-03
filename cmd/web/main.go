@@ -7,26 +7,31 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Scr3amz/websiteProject/internal/web/config"
 	"github.com/Scr3amz/websiteProject/internal/web/handlers"
 	"github.com/Scr3amz/websiteProject/pkg/models/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
-	port := ":3000"
+	config, err := config.LoadConfig()
+	if err!= nil {
+        log.Fatal("Failed to load configuration\n",err)
+    }
 
 	/* Логгеры для более удобной и настраевоемой обработки ошибок и
 	выводе информации в терминал */
 	InfoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	ErrorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	/* Подключение к пулу соединений с базой данных */
-	db, err := openDB("web:8803@/mvol_website?parseTime=true")
+	/* Подключение к пулу соединений с базой данных
+	"web:8803@/mvol_website?parseTime=true" */
+	db, err := openDB( config.DBUser + ":" + config.DBPass + "@/" + config.DBName + "?" + config.DriverParams)
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
-
 	defer db.Close()
+	
 
 	app := handlers.Application{
 		InfoLog:  InfoLog,
@@ -37,12 +42,12 @@ func main() {
 	/* Отдельный объект для сервера чтобы указать в качестве поля ErrorLog свой логгер, а
 	в качестве обработчика функцию, создающую маршрутизатор*/
 	server := &http.Server{
-		Addr:     port,
+		Addr:     config.Port,
 		Handler:  app.Router(),
 		ErrorLog: ErrorLog,
 	}
 
-	InfoLog.Printf("Запуск сервера на порте: %s", port)
+	InfoLog.Printf("Запуск сервера по адресу: 127.0.0.1%s", config.Port)
 	ErrorLog.Fatal(server.ListenAndServe())
 
 }
