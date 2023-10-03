@@ -72,9 +72,6 @@ func (app *Application) notes_page(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	// for _,note := range notes {
-	// 	fmt.Fprintf(w, "%v", note)
-	// }
 
 	data := utils.CreateData()
 	data.Notes = notes
