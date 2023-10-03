@@ -10,7 +10,6 @@ func (app *Application) Router() *http.ServeMux {
 	// Обработчики статических и html- файлов
 
 	mux.HandleFunc("/", app.index)
-	mux.HandleFunc("/about/", app.about_page)
 	mux.HandleFunc("/notes/", app.notes_page)
 	mux.HandleFunc("/notes/show/", app.show_note)
 	mux.HandleFunc("/notes/create/", app.create_note)

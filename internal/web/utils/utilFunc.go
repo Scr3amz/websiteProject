@@ -2,6 +2,8 @@ package utils
 
 import (
 	"database/sql"
+	"encoding/json"
+	"net/http"
 
 	"github.com/Scr3amz/websiteProject/pkg/models"
 )
@@ -27,4 +29,10 @@ func OpenDB(dsn string) (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func DecodeJSON(r *http.Request, v interface{}) error {
+	defer r.Body.Close()
+	decoder := json.NewDecoder(r.Body)
+    return decoder.Decode(v)
 }

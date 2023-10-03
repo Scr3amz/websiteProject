@@ -36,30 +36,6 @@ func (app *Application) index(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// Обработчик страницы "обо мне"
-func (app *Application) about_page(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/about/" {
-		app.notFound(w)
-		return
-	}
-	files := []string{
-		"./ui/html/about.html",
-		"./ui/html/header.html",
-		"./ui/html/footer.html",
-	}
-	t, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	err = t.ExecuteTemplate(w, "about", nil)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-}
-
 /*Обработчик страницы с заметками*/
 func (app *Application) notes_page(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/notes/" {
@@ -130,18 +106,23 @@ func (app *Application) show_note(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/* Обработчик для создания заметки*/
+/* Обработчик для создания заметки. Ждёт POST-запрос в json-формате
+с указанием названия заметки (title) и её содержания (content)*/
 func (app *Application) create_note(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 
-	title := "test note"
-	content := "test content"
-	expires := "2"
+	var note models.Note
+	err := utils.DecodeJSON(r, &note)
+	if err!= nil {
+		fmt.Println(err)
+        app.clientError(w, http.StatusBadRequest)
+        return
+    }
 
-	id, err := app.Notes.Insert(title, content, expires)
+	id, err := app.Notes.Insert(note.Title, note.Content, "1")
 	if err != nil {
 		app.serverError(w, err)
 		return

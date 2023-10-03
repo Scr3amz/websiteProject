@@ -11,12 +11,9 @@ type NoteModel struct {
 	DB *sql.DB
 }
 
-/*
-	Метод для создания новых заметок, принимает название, содержание, и
-
+/* Метод для создания новых заметок, принимает название, содержание, и
 количество дней, которое заметка будет храниться. Возвращает id заметки,
-которую добавил
-*/
+которую добавил */
 func (m *NoteModel) Insert(title, content, expires string) (int, error) {
 	/*SQL-запрос с использованием плейсхолдеров*/
 	sqlCommand := `INSERT INTO notes (title,content,created,expires)
@@ -33,11 +30,8 @@ func (m *NoteModel) Insert(title, content, expires string) (int, error) {
 	return int(id), nil
 }
 
-/*
-	Метод, для получения заметки, принимающий её id. Возвращает указатель
-
-на структуру Note, которая заполняется из БД
-*/
+/* Метод, для получения заметки, принимающий её id. Возвращает указатель
+на структуру Note, которая заполняется из БД */
 func (m *NoteModel) Get(id int) (*models.Note, error) {
 	sqlCommand := "SELECT * FROM notes WHERE id = ? AND expires > LOCALTIMESTAMP()"
 	row := m.DB.QueryRow(sqlCommand, id)
@@ -54,6 +48,8 @@ func (m *NoteModel) Get(id int) (*models.Note, error) {
 	return note, nil
 }
 
+/* Метод, для получения последних 10 заметок. Возвращает указатель на срез
+ структур Note, которые заполняюся из БД */
 func (m *NoteModel) Latest() ([]*models.Note, error) {
 	sqlCommand := "SELECT * FROM notes WHERE expires > LOCALTIMESTAMP() ORDER BY created DESC LIMIT 10"
 
